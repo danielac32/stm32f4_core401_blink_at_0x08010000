@@ -632,3 +632,54 @@ switch(svc_nr) {
 //sp[0]=0xbebecafe;
 SYS_EXIT();
 }
+/*
+#include <stdio.h>
+
+// Prototipos de las funciones
+void handle_XINU_FREE_HEAP(uint32 *sp);
+void handle_XINU_LOAD_ELF(uint32 *sp);
+void handle_XINU_CD(uint32 *sp);
+// Agrega más prototipos de funciones según sea necesario...
+
+// Define un tipo para los punteros a funciones que toman un uint32 * como argumento
+typedef void (*svc_handler_t)(uint32 *);
+
+// Define el array de punteros a funciones
+svc_handler_t svc_handlers[] = {
+    handle_XINU_FREE_HEAP,
+    handle_XINU_LOAD_ELF,
+    handle_XINU_CD,
+    // Agrega más punteros a funciones según sea necesario...
+};
+
+// Implementación de la función para manejar XINU_FREE_HEAP
+void handle_XINU_FREE_HEAP(uint32 *sp) {
+    sp[0] = heap_free();
+}
+
+// Implementación de la función para manejar XINU_LOAD_ELF
+void handle_XINU_LOAD_ELF(uint32 *sp) {
+    sp[0] = elf_execve((char *)sp[1], (exec_img *)sp[2]);
+}
+
+// Implementación de la función para manejar XINU_CD
+void handle_XINU_CD(uint32 *sp) {
+    cd((char *)sp[1]);
+}
+
+// Implementa más funciones según sea necesario...
+
+void svccall_handler(uint32 *sp) {
+    SYS_ENTRY();
+    uint32 svc_nr = sp[0];
+
+    if (svc_nr < sizeof(svc_handlers) / sizeof(svc_handlers[0])) {
+        // Llama a la función correspondiente según el número de la llamada al sistema
+        svc_handlers[svc_nr](sp);
+    } else {
+        kprintf("syscall no implement, %d\n", svc_nr);
+    }
+
+    SYS_EXIT();
+}
+*/
