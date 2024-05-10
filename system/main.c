@@ -84,7 +84,7 @@ int main()
     fl_listdirectory("/");
     
 
-    kprintf("file booted -> %s\n",getUrlTargetFileBoot());
+    kprintf("file booted -> (%s)\n",getUrlTargetFileBoot());
     init_kernel();
       
     while(1){

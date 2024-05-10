@@ -12,6 +12,5 @@ extern void shell();
 
 void usr(){
 	syscall_init(&syscallp);
-	ready(create((void *)shell,STACK_SIZE,1,"shell",0));
-    
+	ready(create((void *)shell,STACK_SIZE,1,"shell",0));   
 }
