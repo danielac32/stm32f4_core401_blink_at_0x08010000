@@ -35,12 +35,15 @@ void toggle(int m){
 
 int main()
 {
+    
+    
     hw_cfg_pin(GPIOx(GPIO_C),13,GPIOCFG_MODE_OUT | GPIOCFG_OSPEED_VHIGH  | GPIOCFG_OTYPE_PUPD | GPIOCFG_PUPD_PUP);
     hw_cfg_pin(GPIOx(GPIO_A),0,GPIOCFG_MODE_INP | GPIOCFG_OSPEED_VHIGH  | GPIOCFG_OTYPE_OPEN | GPIOCFG_PUPD_PUP);
     hw_set_pin(GPIOx(GPIO_C),13, 0);
     //hw_cfg_pin(GPIOx(GPIO_C),9,GPIOCFG_MODE_OUT | GPIOCFG_OSPEED_VHIGH  | GPIOCFG_OTYPE_PUPD | GPIOCFG_PUPD_PUP);
-    //hw_cfg_pin(GPIOx(GPIO_A),8,GPIOCFG_MODE_OUT | GPIOCFG_OSPEED_VHIGH  | GPIOCFG_OTYPE_PUPD | GPIOCFG_PUPD_PUP);
+    hw_cfg_pin(GPIOx(GPIO_A),8,GPIOCFG_MODE_OUT | GPIOCFG_OSPEED_VHIGH  | GPIOCFG_OTYPE_PUPD | GPIOCFG_PUPD_PUP);
 
+     
 
     while(1){
         if(!hw_get_pin(GPIOx(GPIO_A),0) || usb_available()){
@@ -51,45 +54,43 @@ int main()
         hw_toggle_pin(GPIOx(GPIO_C),13);
         delay(50);
     }
-
+    
     struct  memblk  *memptr;  /* Ptr to memory block    */
-    uint32  free_mem;   /* Total amount of free memory  */
+      uint32  free_mem;   /* Total amount of free memory  */
 
-    /* Output Xinu memory layout */
-    free_mem = 0;
-    for (memptr = memlist.mnext; memptr != NULL; memptr = memptr->mnext) {
-         free_mem += memptr->mlength;
-    }
-    kprintf("%10d bytes of free memory.  Free list:\n", free_mem);
-    for (memptr=memlist.mnext; memptr!=NULL;memptr = memptr->mnext) {
-        kprintf("           [0x%08X to 0x%08X]\n",
-      (uint32)memptr, ((uint32)memptr) + memptr->mlength - 1);
-    }
+      /* Output Xinu memory layout */
+      free_mem = 0;
+      for (memptr = memlist.mnext; memptr != NULL; memptr = memptr->mnext) {
+           free_mem += memptr->mlength;
+      }
+      kprintf("%10d bytes of free memory.  Free list:\n", free_mem);
+      for (memptr=memlist.mnext; memptr!=NULL;memptr = memptr->mnext) {
+          kprintf("           [0x%08X to 0x%08X]\n",
+        (uint32)memptr, ((uint32)memptr) + memptr->mlength - 1);
+      }
     
     
-    sd_init();
-    fl_init();
+     int size = sd_init();
+     kprintf("size flash: %d\n",size);
+     /*if (fl_format(size, "")){
+            kprintf("format ok\n");
+            while(1);
+        }*/
+     fl_init();
 
-    // Attach media access functions to library
-    if (fl_attach_media(sd_readsector, sd_writesector) != FAT_INIT_OK)
-    {
-        kprintf("ERROR: Failed to init file system\n");
-        return -1;
-    }
+      // Attach media access functions to library
+      if (fl_attach_media(sd_readsector, sd_writesector) != FAT_INIT_OK)
+      {
+          kprintf("ERROR: Failed to init file system\n");
+          return -1;
+      }
  
   // List the root directory
     fl_listdirectory("/");
     
 
-    kprintf("file booted -> (%s)\n",getUrlTargetFileBoot());
+    kprintf("file booted -> %s\n",getUrlTargetFileBoot());
     init_kernel();
-      
-    /*while(1){
-         
-       hw_toggle_pin(GPIOx(GPIO_C),13);
-       kprintf("blink \n");
-       delay(100);
-    }*/
 
     return 0;
 }

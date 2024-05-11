@@ -50,8 +50,8 @@ SHELLOBJ         = $(addprefix $(OBJDIR)/, $(addsuffix .o, $(notdir $(basename $
 
  
 
-SRCBERRY         =# $(wildcard berry/src/*.c)  $(wildcard berry/default/*.c)  
-BERRYOBJ         =# $(addprefix $(OBJDIR)/, $(addsuffix .o, $(notdir $(basename $(SRCBERRY)))))
+SRCBERRY         = #$(wildcard berry/src/*.c)  $(wildcard berry/default/*.c)  
+BERRYOBJ         = #$(addprefix $(OBJDIR)/, $(addsuffix .o, $(notdir $(basename $(SRCBERRY)))))
 
 
 

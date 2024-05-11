@@ -601,7 +601,7 @@ void shell(){
 		}
 
 	    for (j = 0; j < ncmd; j++) {
-            src = (char *)cmdtab[j].cname;//
+            src = cmdtab[j].cname;
             cmp = tokbuf;
             diff = FALSE;
             while (*src != NULLCH) {

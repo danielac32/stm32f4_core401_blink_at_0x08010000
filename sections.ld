@@ -2,9 +2,9 @@
 
 MEMORY
 {
+
   FLASHROM (rx)  : ORIGIN = 0x08010000, LENGTH = 256K
   RAM      (rw)  : ORIGIN = 0x20000000, LENGTH = 64K
-  /* CCMRAM    (xrw)    : ORIGIN = 0x10000000,   LENGTH = 64K */
 }
 
 

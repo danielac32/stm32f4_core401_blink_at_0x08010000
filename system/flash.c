@@ -190,7 +190,7 @@ char *getUrlTargetFileBoot(){
     fseek(fptr, 0, SEEK_END);
     int lsize = ftell(fptr);
     fseek(fptr, 0, SEEK_SET);
-    char *b=buff;//char *b=&buff// malloc(lsize+1);
+    char *b=&buff;// malloc(lsize+1);
 
     while(!feof(fptr)){
          buff[i]=fgetc(fptr);
