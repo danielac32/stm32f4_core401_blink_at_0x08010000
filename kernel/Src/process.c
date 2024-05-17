@@ -282,10 +282,10 @@ int ilde(){
 extern void usr();
 
 int nullp(){
-	ready(create((void *)ilde,512,1,"blink",0));
+	//ready(create((void *)ilde,512,1,"blink",0));
     //ready(create((void *)ilde2,1024,1,"blink2",0));
     //ready(create((void *)ilde3,1024,1,"blink3",0));
-	ready(create((void *)usr,STACK_SIZE,1,"usr",0));
+	ready(create((void *)usr,512,1,"usr",0));
     kprintf("ilde nullp..\n");
 	//while(1){
 	  //  PEND_SV();
@@ -310,7 +310,7 @@ for (int i = 0; i < MAX_NUMBER_OF_TASKS; ++i){
 }
 clkinit();
 
-int pid=create(nullp, STACK_SIZE/2, 1, "nullp", 0);
+int pid=create(nullp, /*STACK_SIZE/2*/512, 1, "nullp", 0);
 active_task =& task[pid];
 active_task->state=PR_CURR;
 kprintf ("Build date: %s %s\n\n", __DATE__, __TIME__);

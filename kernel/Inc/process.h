@@ -75,7 +75,6 @@ extern int create(
 #define NULLTHREAD  0           /**< id of the null thread              */
 #define BADTID      (-1)        /**< used when invalid tid needed       */
 
-
 typedef struct task_t
 {
     void  *prstkbase; /* Base of run time stack   */
@@ -90,7 +89,7 @@ typedef struct task_t
     //uint32 wait_ticks;
     uint32 param;
     //sem_t sem;
-    char name[16];
+    char name[20];
     bool  elf;
     void *img;
     

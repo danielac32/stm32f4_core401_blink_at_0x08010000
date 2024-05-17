@@ -218,6 +218,35 @@ flash_info_t* flash_spi_getcardinfo(void){
 
 
 
+
+
+
+static unsigned char disk_read4K (uint8_t *rxbuf, uint32_t sector, uint32_t count){
+  unsigned char res=0;
+  for(;count>0;count--)
+  {
+    SPI_Flash_Read(rxbuf,sector*FLASH_SECTOR_SIZE4K,FLASH_SECTOR_SIZE4K);
+    sector++;
+    rxbuf+=FLASH_SECTOR_SIZE4K;
+  }
+  hw_toggle_pin(GPIOx(GPIO_C),13);
+  return res;
+}
+static unsigned char disk_write4K (const uint8_t *txbuf, uint32_t sector, uint32_t count){
+  unsigned char res=0;
+  for(;count>0;count--)
+  {                       
+     SPI_Flash_Write((uint8_t*)txbuf,sector*FLASH_SECTOR_SIZE4K,FLASH_SECTOR_SIZE4K);
+     sector++;
+     txbuf+=FLASH_SECTOR_SIZE4K;
+  }
+  hw_toggle_pin(GPIOx(GPIO_C),13);
+  return res;
+}
+
+
+//////////////////////////////
+
 static unsigned char disk_read (uint8_t *rxbuf, uint32_t sector, uint32_t count){
   unsigned char res=0;
   for(;count>0;count--)
@@ -240,6 +269,13 @@ static unsigned char disk_write (const uint8_t *txbuf, uint32_t sector, uint32_t
   hw_toggle_pin(GPIOx(GPIO_C),13);
   return res;
 }
+
+
+const w25qxxx_drv_t4K w25qxxx_drv4K =
+{
+    disk_read4K,//sd_spi_read,
+    disk_write4K,//sd_spi_write,
+};
 
 
 const w25qxxx_drv_t w25qxxx_drv =

@@ -16,10 +16,10 @@
 #include <shell.h>
 #include <elf.h>
 #include <stdlib.h>
-
- 
-
-
+#include <syscall.h>
+ #include <cache-flash.h>
+#include <w25qxxx.h>
+extern const w25qxxx_drv_t w25qxxx_drv;
 extern int lib_putc(int ch);
 typedef char buf_t[128];
 buf_t path, curdir = "/";
@@ -55,7 +55,7 @@ char* full_path(const char* name) {
 }
 
 
- 
+
 int  cd(int argc, char *argv[]);
 int  ls(int argc, char *argv[]);
 int  cat(int argc, char *argv[]);
@@ -83,17 +83,47 @@ int load(int argc, char *argv[]);
 int test(int argc, char *argv[]){
     
 
-    printf("malloc\n");
-    char *textc4 = malloc(10000);
-    char *datac4 = malloc(1000);
-    char *stack = malloc(1000);
-    char *symbols = malloc(3000);
+    /*printf("malloc\n");
+    char *textc4 = syscallp.malloc(10000);
+    char *datac4 = syscallp.malloc(1000);
+    char *stack = syscallp.malloc(1000);
+    char *symbols = syscallp.malloc(3000);
 
     printf("free\n");
-    free(textc4);
-    free(datac4);
-    free(stack);
-    free(symbols);
+    syscallp.free(textc4);
+    syscallp.free(datac4);
+    syscallp.free(stack);
+    syscallp.free(symbols);*/
+    printf("test cache\n");
+    cachebegin(2000000);
+    
+    /*cachewrite(500000,0xbe);
+    cachewrite(500000-1,0xbe);
+    cachewrite(500000-2,0xbe);
+    cachewrite(500000-3,0xca);
+    cachewrite(500000-4,0xfe);
+ 
+    uint8 c = cacheread(500000);
+    kprintf("%02x\n",c);
+
+
+    c = cacheread(500000-1);
+    kprintf("%02x\n",c);
+
+    c = cacheread(500000-2);
+    kprintf("%02x\n",c);
+
+    c = cacheread(500000-3);
+    kprintf("%02x\n",c);
+
+    c = cacheread(500000-4);
+    kprintf("%02x\n",c);*/
+    for (int i = 0; i < 8000; ++i)
+    {
+        uint8 c = cacheread(i);
+        printf("%02x\n",c);
+    }
+     
     return 0;
 }
 
@@ -122,10 +152,16 @@ uint32  ncmd = sizeof(cmdtab) / sizeof(struct cmdent);
 
 
 int  formatp(int argc, char *argv[]){
-    if (fl_format(31250, "")){
+    flash_info_t *flash_info;
+    flash_info = w25qxxx_drv.getcardinfo();
+
+    printf("formating...");
+    if (fl_format(flash_info->card_size, "")){
          printf("format ok\n");
          return 0;
-      }
+    }else{
+        printf("error formating...");
+    }
     return 0;
 }
 
@@ -195,14 +231,14 @@ static void printMemUse(void)
 
 int mem(int argc, char *argv[])
 { 
-    uint32 memfree=heap_free();
+    uint32 memfree=syscallp.freeHeap();//heap_free();
     //uint32 fsfree=syscallp.disk_free();
 
     printf("mem free: %d\n", memfree);
     //printf("fs free: %d\n", fsfree);
     //printf("ok\n");
-    printFreeList();
-    printMemUse();
+    //printFreeList();
+    //printMemUse();
     return 0;
 }
 
@@ -228,7 +264,7 @@ int  cd(int argc, char *argv[]){
             *(cp + 1) = 0;
         goto cd_done;
    }
-   full_path(s);
+   syscallp.full_path(s);
 
    if(!fl_opendir(path,&dirstat)){
        printf("%s not found!\n",path );
@@ -273,7 +309,7 @@ return 0;
 
 int ls(int argc, char *argv[]){
     FL_DIR dirstat;
-    char *tmp=full_path("");
+    char *tmp=syscallp.full_path("");
     if (fl_opendir(tmp, &dirstat))
     {
         struct fs_dir_ent dirent;
@@ -301,7 +337,7 @@ int dump(int argc, char *args[])
 
      FILE* fd;
 
-    char *tmp=full_path(args[1]);
+    char *tmp=syscallp.full_path(args[1]);
     if (!(fd = fopen(tmp,"r"))){
         printf("%s not found\n", tmp);
         return -1;
@@ -326,7 +362,7 @@ int dump(int argc, char *args[])
     fclose(fd);
 
 
-    update_path();
+    syscallp.updatepath();//update_path();
     
     return 0;
 }
@@ -339,13 +375,13 @@ int cat(int argc, char *argv[])
     if(argc <2)return -1;
     if (!strcmp(argv[argc-2],">")){
 
-        char *tmp=full_path((char*)argv[argc-1]);
+        char *tmp=syscallp.full_path((char*)argv[argc-1]);
         if (tmp==NULL)return -1;
         //if(disk.exist(tmp)){
         fd = fopen(tmp, "w");
         if(!fd){
            printf("%s found!\n",tmp );
-           update_path();//strcpy(path, curdir);
+           syscallp.updatepath();//update_path();//strcpy(path, curdir);
            return 0;
         }
         for (int i = 1; i < argc-2; ++i)
@@ -357,7 +393,7 @@ int cat(int argc, char *argv[])
     }else{
 
 
-        char *tmp=full_path((char*)argv[argc-1]);
+        char *tmp=syscallp.full_path((char*)argv[argc-1]);
 
         if (!(fd = fopen(tmp,"r"))){
             printf("%s not found\n", tmp);
@@ -373,7 +409,7 @@ int cat(int argc, char *argv[])
         }
         fclose(fd);
     }
-    update_path();//strcpy(path, curdir);
+    syscallp.updatepath();//update_path();//strcpy(path, curdir);
 
     return 0;
 }
@@ -411,33 +447,36 @@ int killp(int argc, char *argv[])
 int mkdirp(int argc, char *argv[])
 {
     FL_DIR dirstat;
-    char *tmp=full_path((char*)argv[1]);
+    char *tmp=syscallp.full_path((char*)argv[1]);
     if(fl_opendir(tmp,&dirstat)){
         fl_closedir(&dirstat);
         printf("dir found %s\n",tmp);
         return 0;
     }
     
-    //mkdir(tmp);
+    mkdir(tmp);
     return 0;
 }
 
 int rm(int argc, char *argv[])
 {
     FILE* fd;
-    char *tmp=full_path((char*)argv[1]);
+    char *tmp=syscallp.full_path((char*)argv[1]);
     if (!(fd = fopen(tmp,"r"))){
         printf("not found %s\n",tmp);
         return -1;
     }
-    remove(tmp);
+    fclose(fd);
+    if(remove(tmp)<0){
+       printf("error remove \n");
+    }
 	return 0;
 }
 int pwd(int argc, char *argv[])
 {
 
     int i;
-    char *s=full_path("");
+    char *s=syscallp.full_path("");
     printf("%s\n",s );
 	return 0;
 }
@@ -447,7 +486,7 @@ int touch(int argc, char *argv[])
 {
 
     FILE* fd;
-    char *tmp=full_path((char*)argv[1]);
+    char *tmp=syscallp.full_path((char*)argv[1]);
     if ((fd = fopen(tmp,"r"))){
         printf("file found %s\n",tmp);
         fclose(fd);
@@ -465,14 +504,15 @@ int touch(int argc, char *argv[])
 
 
 int run(int nargs, char *args[]){
-    char *tmp=full_path((char*)args[1]);
+    char *tmp=syscallp.full_path((char*)args[1]);
     FILE *fptr;
     exec_img ximg;
     printf("file : %s\n",tmp);
     int ret = elf_execve(tmp,&ximg);
     if(ret > 0){
         int (*p) = (int *)ret;
-        //int pid = syscallp.create((void *)p, 4096, 3, args[1]);
+        //int pid = syscallp.create((void *)p, 2048, 3, args[1]);
+        //int pid = syscallp.create((void *)p, 2048, 3, tmp);
         int pid = create((void *)p, 2048, 3, tmp, 0);
         task_t *prptr=& task[pid];
         //task_t *prptr=disk.self(pid); 
@@ -486,7 +526,7 @@ int run(int nargs, char *args[]){
         printf("error loading elf process  %d %s\n",ret,tmp);
     }
 
-    update_path();
+    syscallp.updatepath();
     return 0;
 }
 
@@ -601,7 +641,7 @@ void shell(){
 		}
 
 	    for (j = 0; j < ncmd; j++) {
-            src = cmdtab[j].cname;
+            src = (char *)cmdtab[j].cname;
             cmp = tokbuf;
             diff = FALSE;
             while (*src != NULLCH) {
@@ -631,6 +671,8 @@ void shell(){
         if (backgnd == FALSE){
             cmdtab[j].cfunc(ntok, args);
         }else{
+            //int child = syscallp.create((void *)p, 2048, 3, args[0]);
+           // int child = syscallp.create(cmdtab[j].cfunc, cmdtab[j].stack, 3, args[0],0);
             int child = create(cmdtab[j].cfunc, cmdtab[j].stack, 3, args[0],0);
             task_t *prptr=&task[child];   
             //prptr->elf = FALSE;
@@ -638,7 +680,7 @@ void shell(){
             context_t *ctx = (context_t*)prptr->sp;
             ctx->r0 = (uint32) ntok;
             ctx->r1 = (uint32)&args[0];
-            ready(child);
+            ready(child);//syscallp.ready(child);
               //irq_restore(q);
             continue;
         }

@@ -1,0 +1,52 @@
+#ifndef BE_VM_H
+#define BE_VM_H
+
+#include "be_object.h"
+
+typedef struct bglobaldesc {
+    struct {
+        bmap *vtab; /* global variable index table */
+        bvector vlist; /* global variable list */
+    } global;
+    struct {
+        bmap *vtab; /* built-in variable index table */
+        bvector vlist; /* built-in variable list */
+    } builtin;
+} bglobaldesc;
+
+typedef struct {
+    bvalue *func; /* function register pointer */
+    bvalue *top; /* top register pointer */
+    bvalue *reg; /* base register pointer */
+    binstruction *ip; /* instruction pointer (only berry-function) */
+    int status;
+} bcallframe;
+
+struct bvm {
+    bstringtable *strtab;
+    bgc *gc;
+    bglobaldesc gbldesc; /* global description */
+    bvalue *stack; /* stack space */
+    bvalue *stacktop; /* stack top register */
+    bupval *upvalist; /* open upvalue list */
+    bstack callstack; /* function call stack */
+    bcallframe *cf; /* function call frame */
+    bvalue *reg; /* function base register */
+    bvalue *top; /* function top register */
+    binstruction *ip; /* function instruction pointer */
+    struct blongjmp *errjmp; /* error jump point */
+    bstack refstack; /* object reference stack */
+    struct bmodule *modulelist;
+};
+
+#define NONE_FLAG           0
+#define BASE_FRAME          (1 << 0)
+#define PRIM_FUNC           (1 << 1)
+
+#define var2cl(_v)          cast(bclosure*, var_toobj(_v))
+#define curcl(_vm)          var2cl((_vm)->cf->func)
+
+void be_dofunc(bvm *vm, bvalue *v, int argc);
+bbool be_value2bool(bvm *vm, bvalue *v);
+
+#endif

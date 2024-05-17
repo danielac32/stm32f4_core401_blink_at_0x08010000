@@ -28,7 +28,7 @@ void    meminit(void)
     /* Initialize the minheap and maxheap variables */
     minheap = (void *)KMALLOC_START;
     /* 1024 bytes is reserved for supervise mode handling */
-    maxheap = (void *)MAXADDR-4096;
+    maxheap = (void *)MAXADDR-1024;
     /* Initialize the memory list as one big block */
     memlist.mnext = (struct memblk *)minheap;
     memptr = memlist.mnext;

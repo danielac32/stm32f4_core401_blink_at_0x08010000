@@ -8,8 +8,9 @@
 #define W25Q32 	0XEF15
 #define W25Q64 	0XEF16
 #define W25Q128  0XEF17
-#define SPI_FLASH_SECTOR_COUNT   31250 
+#define SPI_FLASH_SECTOR_COUNT   (31250-3906)//16m/512=31250// aqui se le restaran 2m que es igual a 2m/512=3906
 #define FLASH_SECTOR_SIZE  512 
+#define FLASH_SECTOR_SIZE4K  4096 
 //#define	SPI_FLASH_CS PCout(4)  //选中FLASH	
 				 
 ////////////////////////////////////////////////////////////////////////////
@@ -64,3 +65,10 @@ typedef struct w25qxxx_drv
 	unsigned char (*write) (const uint8_t *txbuf, uint32_t sector, uint32_t count);
 	flash_info_t* (*getcardinfo) (void);
 } w25qxxx_drv_t;
+
+
+typedef struct w25qxxx_drv4K
+{
+	unsigned char (*read) (uint8_t *rxbuf, uint32_t sector, uint32_t count);
+	unsigned char (*write) (const uint8_t *txbuf, uint32_t sector, uint32_t count);
+} w25qxxx_drv_t4K;

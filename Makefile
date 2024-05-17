@@ -12,12 +12,14 @@ STRIP=arm-none-eabi-strip
 RM = rm -f
 fixpath = $(strip $1)
 
-CFLAGS      ?= -mcpu=cortex-m4  -mfloat-abi=hard -mfpu=fpv4-sp-d16 -ffreestanding -nostdlib -nostartfiles  -fno-builtin
+ 
+CFLAGS      ?= -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -ffreestanding -nostdlib -nostartfiles  -fno-builtin
 LDFLAGS      = -ffreestanding -nostdlib -nostartfiles  -fno-builtin -I include  -I stm32lib -I usblib
-INCLUDES     =   -I include -I gpio/Inc -I sd-spi/Inc -I fat32/Inc -I berry/src -I berry/generate -I berry/default  -I stm32lib -I shell/Inc -I usb/Inc -I usb/class -I kernel/Inc -I spi/Inc -I w25q/Inc
+INCLUDES     =   -I include -I gpio/Inc -I sd-spi/Inc -I fat32/Inc -I berry/src  -I stm32lib -I shell/Inc -I usb/Inc -I usb/class -I kernel/Inc -I spi/Inc -I w25q/Inc
 CFLAGS2     ?= $(CFLAGS) -mthumb $(OPTFLAGS)
 LDSCRIPT     =  sections.ld
 
+ 
 OBJDIR       = obj
 SOURCES      =   $(wildcard system/*.c) $(wildcard system/*.S)
 OBJECTS      = $(addprefix $(OBJDIR)/, $(addsuffix .o, $(notdir $(basename $(SOURCES)))))
@@ -50,7 +52,7 @@ SHELLOBJ         = $(addprefix $(OBJDIR)/, $(addsuffix .o, $(notdir $(basename $
 
  
 
-SRCBERRY         = #$(wildcard berry/src/*.c)  $(wildcard berry/default/*.c)  
+SRCBERRY         = #$(wildcard berry/src/*.c) 
 BERRYOBJ         = #$(addprefix $(OBJDIR)/, $(addsuffix .o, $(notdir $(basename $(SRCBERRY)))))
 
 

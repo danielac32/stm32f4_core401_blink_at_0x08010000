@@ -144,6 +144,81 @@ extern sem_t sem_syscall;
 
 
 int syscall_init(syscall_t *sys_obj);
+typedef void *(*syscall_handler_t)(uint32 *sp);
+
+extern void *SVC_XINU_NULLPROCESS(uint32 *);
+extern void *SVC_XINU_PUTC (uint32 *);
+extern void *SVC_XINU_PUTS (uint32 *);
+extern void *SVC_XINU_GETC(uint32 *);
+extern void *SVC_XINU_GETS(uint32 *);
+extern void *SVC_XINU_CLOSE(uint32 *);  /* Devices */
+extern void *SVC_XINU_OPEN (uint32 *);
+extern void *SVC_XINU_READ (uint32 *);
+extern void *SVC_XINU_WRITE (uint32 *);
+extern void *SVC_XINU_CREATE (uint32 *); /* Processes */ 
+extern void *SVC_XINU_KILL(uint32 *); /* Exit */
+extern void *SVC_XINU_READY (uint32 *);
+extern void *SVC_XINU_SLEEP (uint32 *);
+extern void *SVC_XINU_FREE (uint32 *);
+extern void *SVC_XINU_MALLOC(uint32 *); 
+extern void *SVC_XINU_GETDEV (uint32 *);
+extern void *SVC_XINU_SEMA_INIT(uint32 *);  /* Semapho3 */
+extern void *SVC_XINU_SEMA_SIGNAL(uint32 *); 
+extern void *SVC_XINU_SEMA_WAIT (uint32 *);
+extern void *SVC_XINU_PIN_MODE (uint32 *);
+extern void *SVC_XINU_PIN_SET (uint32 *);
+extern void *SVC_XINU_PIN_GET (uint32 *);
+extern void *SVC_XINU_FREE_HEAP(uint32 *); 
+extern void *SVC_XINU_GETPID (uint32 *);
+extern void *SVC_XINU_EXIST (uint32 *);
+extern void *SVC_XINU_FS_INIT (uint32 *);
+extern void *SVC_XINU_ATTACH_MEDIA(uint32 *); 
+extern void *SVC_XINU_ATTACH_LOCKS (uint32 *); //extern void *SVC_XINU_LIST_DIR 25
+extern void *SVC_XINU_FOPEN(uint32 *);
+extern void *SVC_XINU_FSEEK(uint32 *);
+extern void *SVC_XINU_FREAD(uint32 *);
+extern void *SVC_XINU_FWRITE(uint32 *);
+extern void *SVC_XINU_FCLOSE(uint32 *);
+extern void *SVC_XINU_FTELL(uint32 *);
+extern void *SVC_XINU_FREWIN(uint32 *);
+extern void *SVC_XINU_TRUNCATE(uint32 *);
+extern void *SVC_XINU_SIZE(uint32 *);
+extern void *SVC_XINU_AVAILABLE(uint32 *);
+extern void *SVC_XINU_MKDIR(uint32 *);
+extern void *SVC_XINU_FEOF(uint32 *);
+extern void *SVC_XINU_OPENDIR(uint32 *);
+extern void *SVC_XINU_READDIR(uint32 *);
+extern void *SVC_XINU_REMOVE(uint32 *);
+extern void *SVC_XINU_RENAME(uint32 *);
+extern void *SVC_XINU_FORMAT(uint32 *);
+extern void *SVC_XINU_MOUNT(uint32 *);
+extern void *SVC_XINU_UNMOUNT(uint32 *);
+extern void *SVC_XINU_DISK_FREE(uint32 *);
+extern void *SVC_XINU_CLOSEDIR(uint32 *);
+extern void *SVC_XINU_CREATEDIRECTORY(uint32 *);
+extern void *SVC_XINU_IS_DIR(uint32 *);
+extern void *SVC_XINU_FFLUSH(uint32 *);
+extern void *SVC_XINU_FGETC(uint32 *);
+extern void *SVC_XINU_FGETCS(uint32 *);
+extern void *SVC_XINU_FPUTC(uint32 *);
+extern void *SVC_XINU_FPUTCS(uint32 *);
+extern void *SVC_XINU_FGETPOS(uint32 *);
+extern void *SVC_XINU_NUM_TASK (uint32 *);
+extern void *SVC_XINU_STRUCT_TASK(uint32 *); 
+extern void *SVC_XINU_LOAD_ELF(uint32 *);
+extern void *SVC_XINU_HEAP_FREE(uint32 *);
+extern void *SVC_XINU_YIELD(uint32 *);
+extern void *SVC_XINU_GLOBAL_PATH(uint32 *);
+extern void *SVC_XINU_UPDATE_PATH(uint32 *);
+extern void *SVC_XINU_GET_PATH(uint32 *);
+extern void *SVC_XINU_CD(uint32 *);
+extern void *SVC_XINU_JSON(uint32 *);
+extern void *SVC_XINU_GET_LEN(uint32 *);
+
+
+
+
+
 #endif
 
 

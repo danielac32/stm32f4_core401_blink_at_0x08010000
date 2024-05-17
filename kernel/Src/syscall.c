@@ -17,6 +17,10 @@
 syscall_t *sys;
 sem_t sem_syscall;
 
+extern void update_path();
+extern char* full_path(const char* name);
+extern void cd(char *s);
+
 void* sys_open(const char *path, int flags){
     return (void *)syscall(XINU_FOPEN,path,flags);
 }
@@ -154,7 +158,7 @@ int sys_create(void *procaddr, uint32 ssize, int priority,const char *name){
 }
 
 void *sys_js0n(void *frame){
-    return syscall(XINU_JSON,frame);
+    return (void *)syscall(XINU_JSON,frame);
 }
 
 uint32 sys_free_heap(){
@@ -228,10 +232,6 @@ int syscall_init(syscall_t *sys_obj){
     return 0;
 }
 
-extern void update_path();
-extern char* full_path(const char* name);
-extern void cd(char *s);
-
 
 
 char *loadConfig(char *path,int *size){
@@ -263,6 +263,98 @@ struct jsonframe
     char *find;
 };*/
 
+
+
+
+syscall_handler_t syscall_handlers[] = {
+SVC_XINU_NULLPROCESS,
+SVC_XINU_PUTC ,
+SVC_XINU_PUTS ,
+SVC_XINU_GETC,
+SVC_XINU_GETS,
+SVC_XINU_CLOSE,  /* Devices */
+SVC_XINU_OPEN ,
+SVC_XINU_READ ,
+SVC_XINU_WRITE ,
+SVC_XINU_CREATE , /* Processes */ 
+SVC_XINU_KILL, /* Exit */
+SVC_XINU_READY ,
+SVC_XINU_SLEEP ,
+SVC_XINU_FREE ,
+SVC_XINU_MALLOC, 
+SVC_XINU_GETDEV ,
+SVC_XINU_SEMA_INIT,  /* Semapho3 */
+SVC_XINU_SEMA_SIGNAL, 
+SVC_XINU_SEMA_WAIT ,
+SVC_XINU_PIN_MODE ,
+SVC_XINU_PIN_SET ,
+SVC_XINU_PIN_GET ,
+SVC_XINU_FREE_HEAP, 
+SVC_XINU_GETPID ,
+SVC_XINU_EXIST ,
+SVC_XINU_FS_INIT ,
+SVC_XINU_ATTACH_MEDIA, 
+SVC_XINU_ATTACH_LOCKS , //SVC_XINU_LIST_DIR 25
+SVC_XINU_FOPEN,
+SVC_XINU_FSEEK,
+SVC_XINU_FREAD,
+SVC_XINU_FWRITE,
+SVC_XINU_FCLOSE,
+SVC_XINU_FTELL,
+SVC_XINU_FREWIN,
+SVC_XINU_TRUNCATE,
+SVC_XINU_SIZE,
+SVC_XINU_AVAILABLE,
+SVC_XINU_MKDIR,
+SVC_XINU_FEOF,
+SVC_XINU_OPENDIR,
+SVC_XINU_READDIR,
+SVC_XINU_REMOVE,
+SVC_XINU_RENAME,
+SVC_XINU_FORMAT,
+SVC_XINU_MOUNT,
+SVC_XINU_UNMOUNT,
+SVC_XINU_DISK_FREE,
+SVC_XINU_CLOSEDIR,
+SVC_XINU_CREATEDIRECTORY,
+SVC_XINU_IS_DIR,
+SVC_XINU_FFLUSH,
+SVC_XINU_FGETC,
+SVC_XINU_FGETCS,
+SVC_XINU_FPUTC,
+SVC_XINU_FPUTCS,
+SVC_XINU_FGETPOS,
+SVC_XINU_NUM_TASK ,
+SVC_XINU_STRUCT_TASK, 
+SVC_XINU_LOAD_ELF,
+SVC_XINU_HEAP_FREE,
+SVC_XINU_YIELD,
+SVC_XINU_GLOBAL_PATH,
+SVC_XINU_UPDATE_PATH,
+SVC_XINU_GET_PATH,
+SVC_XINU_CD,
+SVC_XINU_JSON,
+SVC_XINU_GET_LEN
+    // Agrega los punteros a funciones para los demás servicios aquí
+};
+
+ 
+
+void svccall_handler(uint32 *sp) {
+SYS_ENTRY();
+uint32 svc_nr = sp[0];
+if (svc_nr >= 0 && svc_nr < sizeof(syscall_handlers) / sizeof(syscall_handler_t)) {
+    syscall_handler_t handler = syscall_handlers[svc_nr];
+    sp=handler(sp);
+} else {
+    kprintf("Syscall not implemented: %d\n", svc_nr);
+}
+SYS_EXIT();
+}
+
+
+
+#if 0
 void svccall_handler(uint32 *sp) {
 SYS_ENTRY();
 uint32 svc_nr = sp[0];
@@ -632,3 +724,4 @@ switch(svc_nr) {
 //sp[0]=0xbebecafe;
 SYS_EXIT();
 }
+#endif
